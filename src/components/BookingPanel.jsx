@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import {
   countSlots,
   formatDayLabel,
-  formatLongDate,
   getBookableDates,
   getSlotsForDate,
   isBookableDate,
@@ -21,7 +20,7 @@ export default function BookingPanel({ restaurant, onBook }) {
 
   const [selectedDate, setSelectedDate] = useState(minKey)
   const [error, setError] = useState('')
-  const [confirmed, setConfirmed] = useState(null)
+  const navigate = useNavigate()
   // Nav buttons live outside the Swiper so they never cover the date tabs.
   const [prevEl, setPrevEl] = useState(null)
   const [nextEl, setNextEl] = useState(null)
@@ -63,7 +62,8 @@ export default function BookingPanel({ restaurant, onBook }) {
       return
     }
     setError('')
-    setConfirmed(booking)
+    // Take the user straight to their reservations after a successful booking.
+    navigate('/my-bookings', { state: { justBooked: booking } })
   }
 
   return (
@@ -126,33 +126,17 @@ export default function BookingPanel({ restaurant, onBook }) {
           <div className="slot-group" key={period}>
             <p className="slot-period">{period}</p>
             <div className="slot-list">
-              {times.map((time) => {
-                const isBooked =
-                  confirmed && confirmed.bookingDate === selectedDate && confirmed.bookingTime === time
-                return (
-                  <button
-                    type="button"
-                    key={time}
-                    className={`slot ${isBooked ? 'booked' : ''}`}
-                    onClick={() => book(time)}
-                  >
-                    {time}
-                  </button>
-                )
-              })}
+              {times.map((time) => (
+                <button type="button" key={time} className="slot" onClick={() => book(time)}>
+                  {time}
+                </button>
+              ))}
             </div>
           </div>
         ))}
       </div>
 
       {error && <span className="form-error">{error}</span>}
-
-      {confirmed && (
-        <div className="booking-success" role="status">
-          Table booked at {confirmed.restaurantName} on {formatLongDate(confirmed.bookingDate)} at{' '}
-          {confirmed.bookingTime}. See it under <Link to="/my-bookings">My Bookings</Link>.
-        </div>
-      )}
     </section>
   )
 }

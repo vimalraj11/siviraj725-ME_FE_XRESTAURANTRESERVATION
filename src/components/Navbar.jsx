@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 const LINKS = [
   { to: '/', label: 'Find Restaurants' },
@@ -12,6 +12,7 @@ const LINKS = [
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
+  const navigate = useNavigate()
 
   return (
     <header className="header">
@@ -58,9 +59,16 @@ export default function Navbar() {
               </NavLink>
             ),
           )}
-          <Link to="/my-bookings" className="btn btn-primary" onClick={close}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => {
+              close()
+              navigate('/my-bookings')
+            }}
+          >
             My Bookings
-          </Link>
+          </button>
         </div>
       </nav>
     </header>

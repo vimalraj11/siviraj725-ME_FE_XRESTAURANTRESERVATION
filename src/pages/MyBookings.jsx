@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Rating } from '../components/RestaurantCard.jsx'
 import OffersCarousel from '../components/OffersCarousel.jsx'
 import { formatLongDate } from '../utils/bookings.js'
 
 export default function MyBookings({ bookings, onCancel }) {
   const [query, setQuery] = useState('')
+  const justBooked = useLocation().state?.justBooked
 
   const filtered = bookings.filter((b) =>
     `${b.restaurantName} ${b.city} ${b.state}`.toLowerCase().includes(query.trim().toLowerCase()),
@@ -31,6 +32,12 @@ export default function MyBookings({ bookings, onCancel }) {
       <section className="section results">
         <div className="container results-grid">
           <div className="results-list">
+            {justBooked && (
+              <div className="booking-success" role="status">
+                Table booked at {justBooked.restaurantName} on {formatLongDate(justBooked.bookingDate)}{' '}
+                at {justBooked.bookingTime}.
+              </div>
+            )}
             {bookings.length === 0 && (
               <div className="empty card">
                 You have no reservations yet. <Link to="/">Find a restaurant</Link> to book a FREE
